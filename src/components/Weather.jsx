@@ -1,56 +1,42 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Weather.css';
 import search_icon from '../assets/search.png';
-import cloud_icon from '../assets/cloud.png';
-import drizzle_icon from '../assets/drizzle.png';
 import humidity_icon from '../assets/humidity.png';
-import snow_icon from '../assets/snow.png';
 import wind_icon from '../assets/wind.png';
-import clear_icon from '../assets/clear.png';
-import rain_icon from '../assets/rain.png';
-import few_clouds_icon from '../assets/few_clouds.png'; // Add this import
 
 const Weather = () => {
   const inputRef = useRef(null);
 
   const [weatherData, setWeatherData] = useState(false);
-
-  const allIcons = {
-    "01d": clear_icon,
-    "01n": clear_icon,
-    "02d": few_clouds_icon, // Update this line
-    "02n": few_clouds_icon, // Update this line
-    "03d": cloud_icon,
-    "03n": cloud_icon,
-    "04d": drizzle_icon,
-    "04n": drizzle_icon,
-    "09d": rain_icon,
-    "09n": rain_icon,
-    "10d": rain_icon,
-    "10n": rain_icon,
-    "13d": snow_icon,
-    "13n": snow_icon,
-  };
+  const [errorMessage, setErrorMessage] = useState('');
 
   const search = async (city) => {
+    if (!city) {
+      setErrorMessage('Please enter city name');
+      setWeatherData(false);
+      return;
+    }
+
     try {
-      const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=c3defec046517d47b4caca2224dcd2a5`);
+      const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=499cf9b3282adc9422c76ab650d7a8e7`);
       const data = await response.json();
       const weatherData = {
-        icon: allIcons[data.weather[0].icon],
+        icon: `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`,
         temperature: Math.round(data.main.temp - 273.15),
         location: data.name,
         humidity: data.main.humidity,
         windSpeed: data.wind.speed,
       };
       setWeatherData(weatherData);
+      setErrorMessage('');
     } catch (error) {
-      console.error(error);
+      setErrorMessage('Invalid city name, please enter valid city name');
+      setWeatherData(false);
     }
   };
 
   useEffect(() => {
-    search("Mumbai"); // Update this line to search for Kolkata
+    search("Mumbai");
   }, []);
 
   return (
@@ -59,9 +45,12 @@ const Weather = () => {
         <input ref={inputRef} type="text" placeholder="Search for a city" />
         <img src={search_icon} alt="Search Icon" onClick={() => search(inputRef.current.value.trim())} />
       </div>
+      {errorMessage && (
+        <p style={{ fontSize: '24px', marginTop: '10px', color: 'red' }}>{errorMessage}</p>
+      )}
       {weatherData ? (
-        <div>
-          <img src={weatherData.icon} className="weather-icon" alt="Clear Weather Icon" />
+        <div className="weather-info">
+          <img src={weatherData.icon} className="weather-icon" alt="Weather Icon" />
           <p className="temp">{weatherData.temperature}°C</p>
           <p className="location">{weatherData.location}</p>
           <div className="weather-data">

@@ -4,7 +4,9 @@
   box-sizing: border-box;
 }
 .app{
-  background-color: #e2d4ff;
+  background-image: url('C:\Users\Admin\intern-project\src\assets\bg_2.jpg');
   min-height: 100vh;
+  background-repeat: no-repeat;
+  background-size: cover;
   display: grid;
 }
